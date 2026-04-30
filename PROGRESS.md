@@ -12,3 +12,11 @@
 - Created Teacher schema
 - Created Class schema (linked to Teacher & Students)
 - Created Attendance schema (student + class + date + status)
+
+## Phase 3 — Authentication
+
+- Implemented user registration with password hashing
+- Implemented login with JWT token generation
+- Configured JWT strategy for authentication
+- Added Auth Guard to protect routes
+- Implemented Role Guard for role-based access
