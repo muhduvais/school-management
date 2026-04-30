@@ -16,7 +16,12 @@ export class Attendance {
   date!: Date;
 
   @Prop({ enum: AttendanceStatus, default: AttendanceStatus.PRESENT })
-  status!: string;
+  status!: AttendanceStatus;
 }
 
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);
+
+AttendanceSchema.index(
+  { student: 1, class: 1, date: 1 },
+  { unique: true }
+);
