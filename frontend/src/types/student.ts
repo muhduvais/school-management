@@ -4,4 +4,6 @@ export type Student = {
   rollNumber: string;
   age?: number;
   contact?: string;
+  fees: number;
+  isPaid: boolean;
 };

@@ -41,4 +41,12 @@ export class StudentService {
   async remove(id: string) {
     await this.studentModel.findByIdAndDelete(id);
   }
+
+  async markPaid(id: string) {
+    return this.studentModel.findByIdAndUpdate(
+      id,
+      { isPaid: true },
+      { new: true },
+    );
+  }
 }

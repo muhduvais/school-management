@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import useStudents from '@/hooks/useStudents';
-import StudentForm from '@/components/StudentForm';
-import useAuth from '@/hooks/useAuth';
-import api from '@/lib/api';
+import useStudents from "@/hooks/useStudents";
+import StudentForm from "@/components/StudentForm";
+import useAuth from "@/hooks/useAuth";
+import api from "@/lib/api";
 
 export default function StudentsPage() {
   useAuth();
@@ -12,6 +12,11 @@ export default function StudentsPage() {
 
   const handleDelete = async (id: string) => {
     await api.delete(`/students/${id}`);
+    refetch();
+  };
+
+  const markPaid = async (id: string) => {
+    await api.patch(`/students/${id}/pay`);
     refetch();
   };
 
@@ -26,7 +31,17 @@ export default function StudentsPage() {
 
       {students.map((s) => (
         <div key={s._id} className="flex justify-between border p-2 mb-2">
-          <span>{s.name} ({s.rollNumber})</span>
+          <span>
+            {s.name} ({s.rollNumber})
+          </span>
+
+          <span>
+            {s.name} ({s.rollNumber}) - ₹{s.fees} -
+            {s.isPaid ? "Paid" : "Unpaid"}
+          </span>
+
+          {!s.isPaid && <button onClick={() => markPaid(s._id)}>Pay</button>}
+
           <button onClick={() => handleDelete(s._id)}>Delete</button>
         </div>
       ))}
