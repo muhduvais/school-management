@@ -18,7 +18,6 @@ export class TeacherController {
   }
 
   @Get()
-  @Roles('admin')
   findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.teacherService.findAll(Number(page), Number(limit));
   }
