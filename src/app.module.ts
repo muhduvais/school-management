@@ -7,6 +7,7 @@ import { StudentModule } from './modules/student/student.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { ClassModule } from './modules/class/class.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
     TeacherModule,
     ClassModule,
     AttendanceModule,
+    AuthModule,
   ],
   providers: [StudentService],
 })
