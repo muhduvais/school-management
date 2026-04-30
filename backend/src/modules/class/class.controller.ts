@@ -21,8 +21,7 @@ export class ClassController {
   @Get()
   @HttpCode(HttpStatus.OK)
   findAll(@Req() req: any) {
-    const user = req.user;
-    return this.classService.findAll(user);
+    return this.classService.findAll();
   }
 
   @Get(':id')

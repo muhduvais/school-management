@@ -6,12 +6,13 @@ import api from "@/lib/api";
 export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
   const [experience, setExperience] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!name || !email || !experience || !password) {
+    if (!name || !email || !subject || !experience || !password) {
       alert("All fields are required");
       return;
     }
@@ -22,12 +23,14 @@ export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
       await api.post("/teachers", {
         name,
         email,
-        experience,
+        subject,
+        experience: Number(experience),
         password,
       });
 
       setName("");
       setEmail("");
+      setSubject("");
       setExperience("");
       setPassword("");
 
@@ -61,8 +64,16 @@ export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
 
         <input
           className="border p-2 rounded w-full"
+          placeholder="Subject"
+          type="text"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+
+        <input
+          className="border p-2 rounded w-full"
           placeholder="Experience"
-          type="experience"
+          type="number"
           value={experience}
           onChange={(e) => setExperience(e.target.value)}
         />

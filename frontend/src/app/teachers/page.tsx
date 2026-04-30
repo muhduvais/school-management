@@ -44,9 +44,11 @@ export default function TeachersPage() {
       <h1 className="text-2xl font-semibold mb-6">Teachers</h1>
 
       {/* Form */}
-      {role === 'admin' && <div className="mb-6">
-        <TeacherForm onSuccess={fetchTeachers} />
-      </div>}
+      {role === "admin" && (
+        <div className="mb-6">
+          <TeacherForm onSuccess={fetchTeachers} />
+        </div>
+      )}
 
       {/* Loading */}
       {loading && <p className="text-gray-500">Loading teachers...</p>}
@@ -63,12 +65,14 @@ export default function TeachersPage() {
               <p className="text-sm text-gray-500">{t.email}</p>
             </div>
 
-            {role === 'admin' && <button
-              onClick={() => handleDelete(t._id)}
-              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Delete
-            </button>}
+            {role === "admin" && (
+              <button
+                onClick={() => handleDelete(t._id)}
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Delete
+              </button>
+            )}
           </div>
         ))}
       </div>

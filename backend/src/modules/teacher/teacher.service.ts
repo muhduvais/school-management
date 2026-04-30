@@ -1,21 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Teacher, TeacherDocument } from './schemas/teacher.schema';
 import { Model } from 'mongoose';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import * as bcrypt from 'bcryptjs';
-import { UserDocument } from '../users/schemas/user.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class TeacherService {
   constructor(
-    @InjectModel(Teacher.name) 
-    private teacherModel: Model<TeacherDocument>,
-    private userModel: Model<UserDocument>,
+    @InjectModel(Teacher.name) private teacherModel: Model<TeacherDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(dto: CreateTeacherDto) {
+    const existing = await this.userModel.findOne({ email: dto.email });
+    if (existing) throw new ConflictException('Email already registered');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -26,33 +31,59 @@ export class TeacherService {
       role: 'teacher',
     });
 
-    return this.teacherModel.create({
-      name: dto.name,
-      subject: dto.subject,
-      experience: dto.experience,
-      email: dto.email,
-      user: user._id,
-    });
+    try {
+      const { password, ...rest } = dto;
+
+      return await this.teacherModel.create({
+        ...rest,
+        user: user._id,
+      });
+    } catch (error) {
+      await this.userModel.findByIdAndDelete(user._id);
+      console.log('error: ', error);
+      throw error;
+    }
   }
 
   async findAll(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
-    const data = await this.teacherModel.find().skip(skip).limit(limit);
-    const total = await this.teacherModel.countDocuments();
+    const [data, total] = await Promise.all([
+      this.teacherModel
+        .find()
+        .populate('user', '-password')
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.teacherModel.countDocuments(),
+    ]);
 
     return { data, total, page, limit };
   }
 
   async findOne(id: string) {
-    return await this.teacherModel.findById(id);
+    const teacher = await this.teacherModel
+      .findById(id)
+      .populate('user', '-password');
+    if (!teacher) throw new NotFoundException('Teacher not found');
+    return teacher;
   }
 
   async update(id: string, dto: UpdateTeacherDto) {
-    return await this.teacherModel.findByIdAndUpdate(id, dto, { new: true });
+    const updated = await this.teacherModel
+      .findByIdAndUpdate(id, dto, { new: true })
+      .populate('user', '-password');
+    if (!updated) throw new NotFoundException('Teacher not found');
+    return updated;
   }
 
   async remove(id: string) {
+    const teacher = await this.teacherModel.findById(id);
+    if (!teacher) throw new NotFoundException('Teacher not found');
+
+    await this.userModel.findByIdAndDelete(teacher.user);
     await this.teacherModel.findByIdAndDelete(id);
+
+    return { success: true };
   }
 }

@@ -53,6 +53,7 @@ export default function ClassesPage() {
 
       {/* List */}
       <div className="space-y-4">
+        {!loading && classes.length === 0 && <p>No classes assigned yet</p>}
         {classes.map((c) => (
           <div
             key={c._id}

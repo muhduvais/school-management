@@ -15,7 +15,7 @@ export default function Navbar() {
   return (
     <div className="bg-gray-100 mb-6 shadow-sm">
       <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Left: Links */}
+        {/* Left */}
         <div className="flex gap-4 text-sm font-medium">
           <Link href="/dashboard" className="hover:text-blue-500">
             Dashboard
@@ -38,7 +38,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Right: Logout */}
+        {/* Right */}
         <button
           onClick={handleLogout}
           className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm cursor-pointer"

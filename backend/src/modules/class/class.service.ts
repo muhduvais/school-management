@@ -4,28 +4,24 @@ import { Model } from 'mongoose';
 import { Class, ClassDocument } from './schemas/class.schema';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
+import { Teacher, TeacherDocument } from '../teacher/schemas/teacher.schema';
 
 @Injectable()
 export class ClassService {
   constructor(
     @InjectModel(Class.name)
     private classModel: Model<ClassDocument>,
+    @InjectModel(Teacher.name)
+    private teacherModel: Model<TeacherDocument>,
   ) {}
 
   async create(dto: CreateClassDto) {
     return await this.classModel.create(dto);
   }
 
-  async findAll(user: any) {
-    if (user.role === 'admin') {
-      return this.classModel
-        .find()
-        .populate('teacher')
-        .populate('students');
-    }
-
+  async findAll() {
     return this.classModel
-      .find({ teacher: user.userId })
+      .find()
       .populate('teacher')
       .populate('students');
   }
