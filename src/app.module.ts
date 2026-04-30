@@ -5,6 +5,7 @@ import { UsersModule } from './modules/users/users.module';
 import { StudentService } from './modules/student/student.service';
 import { StudentModule } from './modules/student/student.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
+import { ClassModule } from './modules/class/class.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TeacherModule } from './modules/teacher/teacher.module';
     UsersModule,
     StudentModule,
     TeacherModule,
+    ClassModule,
   ],
   providers: [StudentService],
 })
