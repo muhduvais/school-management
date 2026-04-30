@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { AttendanceStatus } from '../../../common/enums/attendance-status.enum';
 
 export type AttendanceDocument = Attendance & Document;
 
@@ -14,7 +15,7 @@ export class Attendance {
   @Prop({ required: true })
   date!: Date;
 
-  @Prop({ enum: ['present', 'absent'], default: 'present' })
+  @Prop({ enum: AttendanceStatus, default: AttendanceStatus.PRESENT })
   status!: string;
 }
 

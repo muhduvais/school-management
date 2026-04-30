@@ -1,4 +1,5 @@
 import { IsMongoId, IsEnum, IsDateString } from 'class-validator';
+import { AttendanceStatus } from '../../../common/enums/attendance-status.enum';
 
 export class CreateAttendanceDto {
   @IsMongoId()
@@ -10,6 +11,6 @@ export class CreateAttendanceDto {
   @IsDateString()
   date!: string;
 
-  @IsEnum(['present', 'absent'])
-  status!: string;
+  @IsEnum(AttendanceStatus)
+  status!: AttendanceStatus;
 }

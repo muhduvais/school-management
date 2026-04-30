@@ -33,6 +33,6 @@ export class TeacherService {
   }
 
   async remove(id: string) {
-    return this.teacherModel.findByIdAndDelete(id);
+    this.teacherModel.findByIdAndDelete(id);
   }
 }

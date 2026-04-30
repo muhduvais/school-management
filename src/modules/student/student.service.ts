@@ -39,6 +39,6 @@ export class StudentService {
   }
 
   async remove(id: string) {
-    return this.studentModel.findByIdAndDelete(id);
+    this.studentModel.findByIdAndDelete(id);
   }
 }

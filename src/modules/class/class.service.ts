@@ -32,6 +32,6 @@ export class ClassService {
   }
 
   async remove(id: string) {
-    return this.classModel.findByIdAndDelete(id);
+    this.classModel.findByIdAndDelete(id);
   }
 }

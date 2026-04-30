@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassService } from './class.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesEnum } from '../../common/enums/roles.enum';
 
 @Controller('classes')
 @UseGuards(JwtAuthGuard)
@@ -11,30 +12,35 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   @Post()
-  @Roles('admin')
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateClassDto) {
     return this.classService.create(dto);
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.classService.findAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     return this.classService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles('admin')
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() dto: UpdateClassDto) {
     return this.classService.update(id, dto);
   }
 
   @Delete(':id')
-  @Roles('admin')
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
-    return this.classService.remove(id);
+    this.classService.remove(id);
   }
 }
