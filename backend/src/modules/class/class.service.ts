@@ -16,8 +16,18 @@ export class ClassService {
     return await this.classModel.create(dto);
   }
 
-  async findAll() {
-    return await this.classModel.find().populate('teacher').populate('students');
+  async findAll(user: any) {
+    if (user.role === 'admin') {
+      return this.classModel
+        .find()
+        .populate('teacher')
+        .populate('students');
+    }
+
+    return this.classModel
+      .find({ teacher: user.userId })
+      .populate('teacher')
+      .populate('students');
   }
 
   async findOne(id: string) {

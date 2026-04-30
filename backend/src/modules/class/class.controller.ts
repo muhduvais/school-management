@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassService } from './class.service';
@@ -20,8 +20,9 @@ export class ClassController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.classService.findAll();
+  findAll(@Req() req: any) {
+    const user = req.user;
+    return this.classService.findAll(user);
   }
 
   @Get(':id')
