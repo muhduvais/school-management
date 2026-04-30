@@ -4,6 +4,7 @@ import { DatabaseModule } from './config/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { StudentService } from './modules/student/student.service';
 import { StudentModule } from './modules/student/student.module';
+import { TeacherModule } from './modules/teacher/teacher.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { StudentModule } from './modules/student/student.module';
     DatabaseModule,
     UsersModule,
     StudentModule,
+    TeacherModule,
   ],
   providers: [StudentService],
 })
