@@ -27,3 +27,10 @@
 - Implemented Teacher CRUD
 - Implemented Class module with teacher & student relationships
 - Implemented Attendance module (mark & query by date)
+
+## Phase 5 — Standards & Validation
+
+- Added global validation pipe
+- Implemented proper HTTP status codes
+- Added structured error handling using Nest exceptions
+- Introduced enums for roles and attendance status
