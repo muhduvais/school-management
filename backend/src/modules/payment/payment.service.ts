@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Payment, PaymentDocument } from './schemas/payment.schema';
 import { Model } from 'mongoose';
+import { BASE_FEE } from '../../common/constants/fees';
 
 @Injectable()
 export class PaymentService {
@@ -11,24 +12,30 @@ export class PaymentService {
   ) {}
 
   async create(studentId: string, amount: number) {
-    return this.paymentModel.create({
+    return await this.paymentModel.create({
       student: studentId,
       amount,
     });
   }
 
-  async findAll() {
-    return this.paymentModel.find().populate('student');
+  async findByStudent(studentId: string) {
+    return this.paymentModel.find({ student: studentId });
   }
 
-  async markPaid(id: string) {
-    const payment = await this.paymentModel.findById(id);
+  async getStudentSummary(studentId: string) {
+    const payments = await this.paymentModel.find({ student: studentId });
 
-    if (!payment) throw new NotFoundException('Payment not found');
+    const paidAmount = payments.reduce((sum, p) => sum + p.amount, 0);
 
-    payment.isPaid = true;
-    payment.paidAt = new Date();
+    const totalFees = BASE_FEE;
 
-    return payment.save();
+    const pendingAmount = totalFees - paidAmount;
+
+    return {
+      totalFees,
+      paidAmount,
+      pendingAmount,
+      payments,
+    };
   }
 }

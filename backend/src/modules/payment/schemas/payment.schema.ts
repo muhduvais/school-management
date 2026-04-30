@@ -11,11 +11,8 @@ export class Payment {
   @Prop({ required: true })
   amount!: number;
 
-  @Prop({ default: false })
-  isPaid!: boolean;
-
-  @Prop()
-  paidAt?: Date;
+  @Prop({ default: Date.now })
+  paidAt!: Date;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

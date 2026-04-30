@@ -6,9 +6,11 @@ import {
   Patch,
   Param,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Types } from 'mongoose';
 
 @Controller('payments')
 @UseGuards(JwtAuthGuard)
@@ -20,13 +22,22 @@ export class PaymentController {
     return this.paymentService.create(body.studentId, body.amount);
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
+  @Get('student/:studentId')
+  findByStudent(@Param('studentId') studentId: string) {
+    return this.paymentService.findByStudent(studentId);
   }
 
-  @Patch(':id/pay')
-  markPaid(@Param('id') id: string) {
-    return this.paymentService.markPaid(id);
+  @Get('summary/:studentId')
+  async getSummary(@Param('studentId') studentId: string) {
+    if (!Types.ObjectId.isValid(studentId)) {
+      throw new BadRequestException('Invalid student ID');
+    }
+
+    const summary = await this.paymentService.getStudentSummary(studentId);
+
+    return {
+      message: 'Student payment summary fetched successfully',
+      data: summary,
+    };
   }
 }
