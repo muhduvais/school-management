@@ -3,8 +3,9 @@ export const getToken = () => {
   return localStorage.getItem('token');
 };
 
-export const setToken = (token: string) => {
+export const login = (token: string, role: string) => {
   localStorage.setItem('token', token);
+  localStorage.setItem("role", role);
 };
 
 export const logout = () => {

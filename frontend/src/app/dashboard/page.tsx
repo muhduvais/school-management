@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import api from '@/lib/api';
-import useAuth from '@/hooks/useAuth';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
+import useAuth from "@/hooks/useAuth";
+import Link from "next/link";
 
 export default function DashboardPage() {
   useAuth();
@@ -18,9 +18,9 @@ export default function DashboardPage() {
     const fetchStats = async () => {
       try {
         const [students, teachers, classes] = await Promise.all([
-          api.get('/students'),
-          api.get('/teachers'),
-          api.get('/classes'),
+          api.get("/students"),
+          api.get("/teachers"),
+          api.get("/classes"),
         ]);
 
         setStats({
@@ -29,7 +29,7 @@ export default function DashboardPage() {
           classes: classes.data.length,
         });
       } catch {
-        console.log('Failed to load stats');
+        console.log("Failed to load stats");
       }
     };
 
@@ -37,44 +37,60 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="p-10">
-      <h1 className="text-2xl mb-6">Dashboard</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="border p-4">
-          <h2>Students</h2>
-          <p className="text-xl">{stats.students}</p>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="border rounded p-4 shadow-sm bg-white">
+          <p className="text-gray-500 text-sm">Students</p>
+          <p className="text-xl font-semibold">{stats.students}</p>
         </div>
 
-        <div className="border p-4">
-          <h2>Teachers</h2>
-          <p className="text-xl">{stats.teachers}</p>
+        <div className="border rounded p-4 shadow-sm bg-white">
+          <p className="text-gray-500 text-sm">Teachers</p>
+          <p className="text-xl font-semibold">{stats.teachers}</p>
         </div>
 
-        <div className="border p-4">
-          <h2>Classes</h2>
-          <p className="text-xl">{stats.classes}</p>
+        <div className="border rounded p-4 shadow-sm bg-white">
+          <p className="text-gray-500 text-sm">Classes</p>
+          <p className="text-xl font-semibold">{stats.classes}</p>
         </div>
       </div>
 
-      {/* Quick navigation */}
-      <div className="flex gap-4">
-        <Link href="/students" className="border px-4 py-2">
-          Manage Students
-        </Link>
+      {/* Quick Navigation */}
+      <div className="border rounded p-4 shadow-sm bg-white">
+        <h2 className="text-lg font-semibold mb-3">Quick Actions</h2>
 
-        <Link href="/teachers" className="border px-4 py-2">
-          Manage Teachers
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/students"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Manage Students
+          </Link>
 
-        <Link href="/classes" className="border px-4 py-2">
-          Manage Classes
-        </Link>
+          <Link
+            href="/teachers"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Manage Teachers
+          </Link>
 
-        <Link href="/attendance" className="border px-4 py-2">
-          Attendance
-        </Link>
+          <Link
+            href="/classes"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Manage Classes
+          </Link>
+
+          <Link
+            href="/attendance"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Attendance
+          </Link>
+        </div>
       </div>
     </div>
   );
