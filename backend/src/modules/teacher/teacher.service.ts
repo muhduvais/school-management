@@ -4,15 +4,35 @@ import { Teacher, TeacherDocument } from './schemas/teacher.schema';
 import { Model } from 'mongoose';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import * as bcrypt from 'bcryptjs';
+import { UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class TeacherService {
   constructor(
-    @InjectModel(Teacher.name) private teacherModel: Model<TeacherDocument>,
+    @InjectModel(Teacher.name) 
+    private teacherModel: Model<TeacherDocument>,
+    private userModel: Model<UserDocument>,
   ) {}
 
   async create(dto: CreateTeacherDto) {
-    return await this.teacherModel.create(dto);
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.userModel.create({
+      name: dto.name,
+      email: dto.email,
+      password: hashedPassword,
+      role: 'teacher',
+    });
+
+    return this.teacherModel.create({
+      name: dto.name,
+      subject: dto.subject,
+      experience: dto.experience,
+      email: dto.email,
+      user: user._id,
+    });
   }
 
   async findAll(page = 1, limit = 10) {

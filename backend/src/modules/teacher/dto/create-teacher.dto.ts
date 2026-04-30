@@ -13,4 +13,7 @@ export class CreateTeacherDto {
 
   @IsEmail()
   email!: string;
+
+  @IsString()
+  password!: string;
 }
