@@ -1,35 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import api from '@/lib/api';
+import useStudents from '@/hooks/useStudents';
+import StudentForm from '@/components/StudentForm';
 import useAuth from '@/hooks/useAuth';
+import api from '@/lib/api';
 
 export default function StudentsPage() {
   useAuth();
 
-  const [students, setStudents] = useState([]);
+  const { students, loading, error, refetch } = useStudents();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-
-      const res = await api.get('/students', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setStudents(res.data.data);
-    };
-
-    fetchData();
-  }, []);
+  const handleDelete = async (id: string) => {
+    await api.delete(`/students/${id}`);
+    refetch();
+  };
 
   return (
     <div className="p-10">
-      <h1>Students</h1>
-      {students.map((s: any) => (
-        <div key={s._id}>{s.name}</div>
+      <h1 className="mb-4 text-xl">Students</h1>
+
+      <StudentForm onSuccess={refetch} />
+
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+
+      {students.map((s) => (
+        <div key={s._id} className="flex justify-between border p-2 mb-2">
+          <span>{s.name} ({s.rollNumber})</span>
+          <button onClick={() => handleDelete(s._id)}>Delete</button>
+        </div>
       ))}
     </div>
   );

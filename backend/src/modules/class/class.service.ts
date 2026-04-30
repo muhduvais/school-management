@@ -13,25 +13,25 @@ export class ClassService {
   ) {}
 
   async create(dto: CreateClassDto) {
-    return this.classModel.create(dto);
+    return await this.classModel.create(dto);
   }
 
   async findAll() {
-    return this.classModel.find().populate('teacher').populate('students');
+    return await this.classModel.find().populate('teacher').populate('students');
   }
 
   async findOne(id: string) {
-    return this.classModel
+    return await this.classModel
       .findById(id)
       .populate('teacher')
       .populate('students');
   }
 
   async update(id: string, dto: UpdateClassDto) {
-    return this.classModel.findByIdAndUpdate(id, dto, { new: true });
+    return await this.classModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   async remove(id: string) {
-    this.classModel.findByIdAndDelete(id);
+    await this.classModel.findByIdAndDelete(id);
   }
 }

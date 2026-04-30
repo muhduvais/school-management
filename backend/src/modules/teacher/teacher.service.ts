@@ -12,7 +12,7 @@ export class TeacherService {
   ) {}
 
   async create(dto: CreateTeacherDto) {
-    return this.teacherModel.create(dto);
+    return await this.teacherModel.create(dto);
   }
 
   async findAll(page = 1, limit = 10) {
@@ -25,14 +25,14 @@ export class TeacherService {
   }
 
   async findOne(id: string) {
-    return this.teacherModel.findById(id);
+    return await this.teacherModel.findById(id);
   }
 
   async update(id: string, dto: UpdateTeacherDto) {
-    return this.teacherModel.findByIdAndUpdate(id, dto, { new: true });
+    return await this.teacherModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   async remove(id: string) {
-    this.teacherModel.findByIdAndDelete(id);
+    await this.teacherModel.findByIdAndDelete(id);
   }
 }

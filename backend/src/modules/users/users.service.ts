@@ -10,10 +10,10 @@ export class UsersService {
     ) {}
 
     async create(data: Partial<User>) {
-        return this.userModel.create(data);
+        return await this.userModel.create(data);
     }
 
     async findByEmail(email: string) {
-        return this.userModel.findOne({ email });
+        return await this.userModel.findOne({ email });
     }
 }

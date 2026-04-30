@@ -12,11 +12,11 @@ export class AttendanceService {
   ) {}
 
   async markAttendance(dto: CreateAttendanceDto) {
-    return this.attendanceModel.create(dto);
+    return await this.attendanceModel.create(dto);
   }
 
   async findByClassAndDate(classId: string, date: string) {
-    return this.attendanceModel
+    return await this.attendanceModel
       .find({ class: classId, date })
       .populate('student');
   }
