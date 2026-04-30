@@ -38,4 +38,11 @@ export class AttendanceService {
       .find({ class: classId, date: normalizedDate })
       .populate('student');
   }
+
+  async getByClass(classId: string) {
+    return this.attendanceModel
+      .find({ class: classId })
+      .populate('student', 'name')
+      .sort({ date: -1 });
+  }
 }
