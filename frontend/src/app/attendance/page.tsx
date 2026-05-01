@@ -131,7 +131,8 @@ export default function AttendancePage() {
                 }}
               >
                 <option value="">Select a class…</option>
-                {classes.map((c: any) => (
+                {Array.isArray(classes) &&
+                classes.map((c: any) => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
               </select>

@@ -1,10 +1,11 @@
 "use client";
 
 import useAuth from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/api";
 import TeacherForm from "@/components/TeacherForm";
 import useRole from "@/hooks/useRole";
+import DeleteConfirmModal from "@/components/ConfirmDelete";
 
 export default function TeachersPage() {
   useAuth();
@@ -13,34 +14,53 @@ export default function TeachersPage() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 6;
+  const totalPages = Math.ceil(total / limit);
 
-  const fetchTeachers = async () => {
+  const fetchTeachers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await api.get("/teachers");
-      setTeachers(res.data.data || res.data);
+
+      const res = await api.get(`/teachers?page=${page}&limit=${limit}`);
+
+      const { data, total } = res.data;
+
+      setTeachers(data);
+      setTotal(total);
     } catch {
       alert("Failed to load teachers");
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
 
   useEffect(() => {
     fetchTeachers();
-  }, []);
+  }, [fetchTeachers]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this teacher? This action cannot be undone.")) return;
+  const confirmDelete = async () => {
+    if (!selectedTeacher) return;
     try {
-      setDeletingId(id);
-      await api.delete(`/teachers/${id}`);
+      setIsDeleting(true);
+      await api.delete(`/teachers/${selectedTeacher._id}`);
+      setDeleteModal(false);
       fetchTeachers();
     } catch {
       alert("Failed to delete teacher");
     } finally {
-      setDeletingId(null);
+      setIsDeleting(false);
+      setSelectedTeacher(null);
     }
+  };
+
+  const openDeleteModal = (teacher: any) => {
+    setSelectedTeacher(teacher);
+    setDeleteModal(true);
   };
 
   // Initials from name
@@ -63,7 +83,8 @@ export default function TeachersPage() {
   ];
   const avatarColor = (name: string) =>
     avatarColors[
-      name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % avatarColors.length
+      name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) %
+        avatarColors.length
     ];
 
   return (
@@ -71,7 +92,9 @@ export default function TeachersPage() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Teachers</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+            Teachers
+          </h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {loading
               ? "Loading…"
@@ -127,7 +150,9 @@ export default function TeachersPage() {
               />
             </svg>
           </div>
-          <p className="text-slate-500 text-sm font-medium">No teachers on staff yet</p>
+          <p className="text-slate-500 text-sm font-medium">
+            No teachers on staff yet
+          </p>
           {role === "admin" && (
             <p className="text-slate-400 text-xs mt-1">
               Use the form above to add your first teacher.
@@ -155,7 +180,9 @@ export default function TeachersPage() {
                   <p className="font-semibold text-slate-900 text-sm leading-tight truncate">
                     {t.name}
                   </p>
-                  <p className="text-xs text-slate-500 truncate mt-0.5">{t.email}</p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                    {t.email}
+                  </p>
                 </div>
               </div>
 
@@ -163,16 +190,36 @@ export default function TeachersPage() {
               <div className="flex flex-wrap gap-2">
                 {t.subject && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                      />
                     </svg>
                     {t.subject}
                   </span>
                 )}
                 {t.experience !== undefined && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
                     </svg>
                     {t.experience} yr{t.experience !== 1 ? "s" : ""} exp.
                   </span>
@@ -183,7 +230,7 @@ export default function TeachersPage() {
               {role === "admin" && (
                 <div className="pt-1 border-t border-slate-100 mt-auto">
                   <button
-                    onClick={() => handleDelete(t._id)}
+                    onClick={() => openDeleteModal(t)}
                     disabled={deletingId === t._id}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer w-full justify-center sm:w-auto"
                   >
@@ -208,6 +255,44 @@ export default function TeachersPage() {
           ))}
         </div>
       )}
+
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-8">
+          <button
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          <span>
+            {page} / {totalPages}
+          </span>
+
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page === totalPages}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      <DeleteConfirmModal
+        open={deleteModal}
+        itemName={selectedTeacher?.name}
+        title="Delete Teacher"
+        description="Removing this teacher will remove them from all assigned classes."
+        loading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setDeleteModal(false);
+          setSelectedTeacher(null);
+        }}
+      />
     </div>
   );
 }

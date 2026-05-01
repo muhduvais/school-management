@@ -19,11 +19,27 @@ export class ClassService {
     return await this.classModel.create(dto);
   }
 
-  async findAll() {
-    return this.classModel
-      .find()
-      .populate('teacher')
-      .populate('students');
+  async findAll(page = 1, limit = 5) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.classModel
+        .find()
+        .populate('teacher')
+        .populate('students')
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }),
+
+      this.classModel.countDocuments(),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   async findOne(id: string) {

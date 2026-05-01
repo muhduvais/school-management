@@ -33,7 +33,7 @@ export class StudentController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+  findAll(@Query('page') page = 1, @Query('limit') limit = 5) {
     return this.studentService.findAll(Number(page), Number(limit));
   }
 

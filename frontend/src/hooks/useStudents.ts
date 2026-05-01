@@ -1,29 +1,54 @@
-'use client';
+import { useState, useEffect, useCallback } from "react";
+import api from "@/lib/api";
 
-import { useEffect, useState } from 'react';
-import api from '@/lib/api';
-import { Student } from '@/types/student';
-
-export default function useStudents(page = 1, limit = 5) {
-  const [students, setStudents] = useState<Student[]>([]);
+export default function useStudents() {
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchStudents = async () => {
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  const limit = 5;
+
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const res = await api.get(`/students?page=${page}&limit=${limit}`);
-      setStudents(res.data.data);
-    } catch (err) {
-      setError('Failed to load students');
+
+      const { data, total } = res.data;
+
+      setStudents(data);
+      setTotal(total);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to fetch students");
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit]);
 
   useEffect(() => {
     fetchStudents();
-  }, [page]);
+  }, [fetchStudents]);
 
-  return { students, loading, error, refetch: fetchStudents };
+  const totalPages = Math.ceil(total / limit);
+
+  const safeSetPage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
+
+  return {
+    students,
+    loading,
+    error,
+    refetch: fetchStudents,
+    page,
+    setPage: safeSetPage,
+    total,
+    totalPages,
+    limit,
+  };
 }

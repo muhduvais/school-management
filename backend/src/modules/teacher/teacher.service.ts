@@ -45,7 +45,7 @@ export class TeacherService {
     }
   }
 
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 6) {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
@@ -55,8 +55,8 @@ export class TeacherService {
         .skip(skip)
         .limit(limit)
         .exec(),
-      this.teacherModel.countDocuments(),
-    ]);
+   this.teacherModel.countDocuments(),
+    ]);   
 
     return { data, total, page, limit };
   }

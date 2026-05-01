@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassService } from './class.service';
@@ -20,8 +33,8 @@ export class ClassController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(@Req() req: any) {
-    return this.classService.findAll();
+  findAll(@Query('page') page = 1, @Query('limit') limit = 5) {
+    return this.classService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')

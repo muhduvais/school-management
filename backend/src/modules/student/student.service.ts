@@ -15,7 +15,7 @@ export class StudentService {
     return await this.studentModel.create(dto);
   }
 
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 5) {
     const skip = (page - 1) * limit;
 
     const data = await this.studentModel.find().skip(skip).limit(limit);
