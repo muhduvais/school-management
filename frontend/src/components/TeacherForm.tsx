@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/api";
 
 import { useForm } from "react-hook-form";
@@ -35,7 +35,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
+export default function TeacherForm({
+  onSuccess,
+  initialData,
+}: {
+  onSuccess: () => void;
+  initialData?: any;
+}) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -49,17 +55,39 @@ export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
     resolver: zodResolver(schema),
   });
 
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        name: initialData.name,
+        email: initialData.email,
+        subject: initialData.subject,
+        experience: String(initialData.experience),
+        password: "",
+      });
+      setExpanded(true);
+    }
+  }, [initialData, reset]);
+
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
 
-      await api.post("/teachers", {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        subject: data.subject.trim(),
-        experience: Number(data.experience),
-        password: data.password,
-      });
+      if (initialData) {
+        await api.patch(`/teachers/${initialData._id}`, {
+          name: data.name.trim(),
+          email: data.email.trim(),
+          subject: data.subject.trim(),
+          experience: Number(data.experience),
+        });
+      } else {
+        await api.post("/teachers", {
+          name: data.name.trim(),
+          email: data.email.trim(),
+          subject: data.subject.trim(),
+          experience: Number(data.experience),
+          password: data.password,
+        });
+      }
 
       reset();
       setExpanded(false);
@@ -289,7 +317,7 @@ export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                   />
                 </svg>
-                Adding…
+                {initialData ? "Updating…" : "Adding…"}
               </>
             ) : (
               <>
@@ -306,7 +334,7 @@ export default function TeacherForm({ onSuccess }: { onSuccess: () => void }) {
                     d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
                   />
                 </svg>
-                Add Teacher
+                {initialData ? "Update Teacher" : "Add Teacher"}
               </>
             )}
           </button>

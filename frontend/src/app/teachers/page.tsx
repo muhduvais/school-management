@@ -16,6 +16,8 @@ export default function TeachersPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -42,6 +44,10 @@ export default function TeachersPage() {
   useEffect(() => {
     fetchTeachers();
   }, [fetchTeachers]);
+
+  const handleEdit = (teacher: any) => {
+    setEditingTeacher(teacher);
+  };
 
   const confirmDelete = async () => {
     if (!selectedTeacher) return;
@@ -106,7 +112,13 @@ export default function TeachersPage() {
       {/* Add form */}
       {role === "admin" && (
         <div className="mb-8">
-          <TeacherForm onSuccess={fetchTeachers} />
+          <TeacherForm
+            onSuccess={() => {
+              setEditingTeacher(null);
+              fetchTeachers();
+            }}
+            initialData={editingTeacher}
+          />
         </div>
       )}
 
@@ -229,6 +241,13 @@ export default function TeachersPage() {
               {/* Delete — admin only, pushed to bottom */}
               {role === "admin" && (
                 <div className="pt-1 border-t border-slate-100 mt-auto">
+                  <button
+                    onClick={() => handleEdit(t)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                  
                   <button
                     onClick={() => openDeleteModal(t)}
                     disabled={deletingId === t._id}
