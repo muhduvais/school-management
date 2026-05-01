@@ -98,7 +98,7 @@ Class → Students → Attendance → Payments
 ### Clone Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/muhduvais/school-management
 cd school-management
 
 ```
