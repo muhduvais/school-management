@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/api";
 
 import { useForm } from "react-hook-form";
@@ -26,7 +26,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function StudentForm({ onSuccess }: { onSuccess: () => void }) {
+export default function StudentForm({
+  onSuccess,
+  initialData,
+}: {
+  onSuccess: () => void;
+  initialData?: any;
+}) {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -39,21 +45,40 @@ export default function StudentForm({ onSuccess }: { onSuccess: () => void }) {
     resolver: zodResolver(schema),
   });
 
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        name: initialData.name,
+        rollNumber: initialData.rollNumber,
+        age: String(initialData.age),
+      });
+      setExpanded(true);
+    }
+  }, [initialData, reset]);
+
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
 
-      await api.post("/students", {
-        name: data.name.trim(),
-        rollNumber: data.rollNumber.trim(),
-        age: Number(data.age),
-      });
+      if (initialData) {
+        await api.patch(`/students/${initialData._id}`, {
+          name: data.name.trim(),
+          rollNumber: data.rollNumber.trim(),
+          age: Number(data.age),
+        });
+      } else {
+        await api.post("/students", {
+          name: data.name.trim(),
+          rollNumber: data.rollNumber.trim(),
+          age: Number(data.age),
+        });
+      }
 
       reset();
       setExpanded(false);
       onSuccess();
     } catch {
-      alert("Failed to add student");
+      alert("Failed to save student");
     } finally {
       setLoading(false);
     }
@@ -83,7 +108,7 @@ export default function StudentForm({ onSuccess }: { onSuccess: () => void }) {
             d="M12 4.5v15m7.5-7.5h-15"
           />
         </svg>
-        Add Student
+        <h2>{initialData ? "Edit Student" : "Add New Student"}</h2>
       </button>
     );
   }
@@ -210,7 +235,13 @@ export default function StudentForm({ onSuccess }: { onSuccess: () => void }) {
             disabled={loading}
             className="inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-60"
           >
-            {loading ? "Adding..." : "Add Student"}
+            {loading
+              ? initialData
+                ? "Updating..."
+                : "Adding..."
+              : initialData
+                ? "Update Student"
+                : "Add Student"}
           </button>
         </div>
       </form>

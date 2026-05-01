@@ -30,6 +30,7 @@ export default function StudentsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [mounted, setMounted] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -61,27 +62,27 @@ export default function StudentsPage() {
   };
 
   const confirmDelete = async () => {
-  if (!selectedStudent) return;
+    if (!selectedStudent) return;
 
-  try {
-    setIsDeleting(true);
+    try {
+      setIsDeleting(true);
 
-    await api.delete(`/students/${selectedStudent._id}`);
+      await api.delete(`/students/${selectedStudent._id}`);
 
-    if (students.length === 1 && page > 1) {
-      setPage(page - 1);
-    } else {
-      refetch();
+      if (students.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        refetch();
+      }
+
+      setDeleteModal(false);
+    } catch {
+      alert("Failed to delete student");
+    } finally {
+      setIsDeleting(false);
+      setSelectedStudent(null);
     }
-
-    setDeleteModal(false);
-  } catch {
-    alert("Failed to delete student");
-  } finally {
-    setIsDeleting(false);
-    setSelectedStudent(null);
-  }
-};
+  };
 
   const openDeleteModal = (student: any) => {
     setSelectedStudent(student);
@@ -156,7 +157,13 @@ export default function StudentsPage() {
       {/* Add form */}
       {role === "admin" && (
         <div className="mb-8">
-          <StudentForm onSuccess={refetch} />
+          <StudentForm
+            onSuccess={() => {
+              setEditingStudent(null);
+              refetch();
+            }}
+            initialData={editingStudent}
+          />
         </div>
       )}
 
@@ -329,26 +336,48 @@ export default function StudentsPage() {
                       </button>
 
                       {role === "admin" && (
-                        <button
-                          onClick={() => openDeleteModal(s)}
-                          disabled={deletingId === s._id}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                          <svg
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
+                        <>
+                          <button
+                            onClick={() => setEditingStudent(s)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                            />
-                          </svg>
-                          {deletingId === s._id ? "Deleting…" : "Delete"}
-                        </button>
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M11 5h2m-1-1v2m6.364 1.636l-9.9 9.9M4 21h5.586a1 1 0 00.707-.293l9.414-9.414a2 2 0 000-2.828l-1.172-1.172a2 2 0 00-2.828 0L6.293 16.707A1 1 0 006 17.414V21z"
+                              />
+                            </svg>
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() => openDeleteModal(s)}
+                            disabled={deletingId === s._id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                              />
+                            </svg>
+                            {deletingId === s._id ? "Deleting…" : "Delete"}
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
